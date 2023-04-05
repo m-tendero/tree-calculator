@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Perfil energético y CO₂</title>
+    <meta property="og:title" content="Perfil energético y CO₂">
+    <link href="style/reset.css" rel="stylesheet">
+    <link href="style/style.css" rel="stylesheet">
+    <script src="script/vue.js"></script>
+    <script src="script/script.js" defer></script>
+  </head>
+  <body>
+    
+    <main id="app">
+            
+      <nav>
+        <button
+          v-for="view in views"
+          @click="currentViewId = view.id"
+          :class="{ active: currentViewId == view.id }">
+          {{ view.name }}    
+        </button>
+        <div id="nav-decoration-1"></div>
+        <div id="nav-decoration-2"></div>
+      </nav>
+
+      <div id="title" :class="{ sources: currentViewId == 'sources' }">
+        <h1>{{ title }}</h1>
+        <div class="h1-echo">{{ title }}</div>
+      </div>
+
+      <section id="explanation" :class="{ visible: currentViewId == 'explanation' }">
+        <img id="explanation-decoration" :src="randomDecorativeTreeUrl">
+        <p>Explicación aquí.</p>
+      </section>
+
+      <section id="form" :class="{ hidden: currentViewId != 'calculation' }">
+
+        <div>
+          <label>
+            Nº de usuarios:
+            <input type="number" v-model.number="numberOfUsers" min="1">
+          </label>
+        </div>
+      
+        <div>
+          
+          <h3>Consumo:</h3>
+          
+          <div>
+
+            <div id="resource-editor-toggle-container"> 
+              <label
+                v-for="resource in resources"
+                :class="[ 'toggle', 'resource-editor-toggle', { active: resource.active } ]">
+                <input type="checkbox" v-model.number="resource.active">{{ resource.name }}
+              </label>
+            </div>
+            
+            <transition-group
+                tag="div"
+                name="resource-editor"
+                class="resource-editor-container">
+              <resource-editor
+                  v-for="resource in resources"
+                  :key="resource.name"
+                  v-bind="resource"
+                  @change-amount="(n) => resource.amount = n"></resource-editor>
+            </transition-group>
+
+          </div>
+        
+        </div>
+
+      </section>
+
+      <section id="results" v-show="currentViewId == 'calculation'">
+        <div v-if="true">
+          <p>Total CO₂ eq: {{ normalizeNumber(co2) }} kg (por usuario: {{ normalizeNumber(co2/numberOfUsers) }})</p>
+          <p>Árboles equivalentes a este CO₂ eq: {{ normalizeNumber(numberOfTrees) }} (por usuario: {{ normalizeNumber(numberOfTrees/numberOfUsers) }})</p>
+        </div>
+        <div v-else>
+          <p>Total kg de CO₂ equivalente al consumo: {{ normalizeNumber(co2) }} kg. Árboles equivalentes a este CO₂ eq: {{ normalizeNumber(numberOfTrees) }}</p>
+          <p>(Por usuario: {{ normalizeNumber(co2/numberOfUsers) }} kg de CO₂ eq, {{ normalizeNumber(numberOfTrees/numberOfUsers) }} árboles)</p>
+        </div>
+      </section>
+      
+      <section
+        id="forest"
+        :class="{ full: currentViewId == 'forest', high: currentViewId == 'sources' }"
+        :style="{ height: forestHeight }">
+        <div
+          v-for="(layer, i) in treeLayers"
+          class="horizon_layer"
+          :id="'horizon_layer_' + (i + 1)" >
+          <div
+            class="background"
+            :style="{ height: layer.height + '%' }">
+          </div>
+          <div class="ground" :style="getGroundStyle(layer, i)"></div>
+          <transition-group
+            tag="div"
+            name="aligned-trees"
+            class="aligned-trees">
+            <template v-for="tree in trees">
+              <img
+                v-if="tree.layer == i"
+                :src="tree.image"
+                :style="generateTreeStyle(tree, layer)">
+            </template>
+          </transition-group>
+          
+        </div>
+          
+      </section>
+
+      <section id="sources" :class="{ visible: currentViewId == 'sources' }">
+        <h2>Fuentes:</h2>
+        <div class="text-content">
+          <p>Fuente 1: ........... ......... .......................</p>
+          <p>Fuente 2: .....</p>
+        </div>
+      </section>
+      
+    </main>
+  </body>
+</html>
