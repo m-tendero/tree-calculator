@@ -1,0 +1,418 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat&display=swap');
+
+:root {
+  --color-text: #444444;
+  --color-0: rgb(255,255,255);
+  --color-1: rgb(198.75,211.25,203.75);
+  --color-2: rgb(142.5,167.5,152.5);
+  --color-3: rgb(86.25,123.75,101.25);
+  --color-4: rgb(30,80,50);
+}
+
+* {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+body {
+  background-color: var(--color-0);
+  color: var(--color-text);
+  font-family: 'Montserrat', Century Gothic, verdana, sans-serif;
+  font-size: 18px;
+}
+
+main#app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 3em;
+  padding-bottom: 4em;
+}
+
+nav {
+  position: fixed;
+  z-index: 10;
+  top: 0;
+  right: 0;
+  border-style: solid;
+  border-color: var(--color-2);
+  border-width: 0 4px;
+}
+
+#nav-decoration-1 {
+  --border-width: 8px;
+  position: absolute;
+  left: calc(var(--border-width) * -2 - 3px);
+  top: 0;
+  height: 0;
+  width: 0;
+  border-left: var(--border-width) solid transparent;
+  border-right: var(--border-width) solid var(--color-2);
+  border-top: var(--border-width) solid var(--color-2);
+  border-bottom: var(--border-width) solid transparent;
+}
+
+#nav-decoration-2 {
+  --border-width: 8px;
+  position: absolute;
+  right: -4px;
+  bottom: calc(var(--border-width) * -2 + 1px);
+  height: 0;
+  width: 0;
+  border-left: var(--border-width) solid transparent;
+  border-right: var(--border-width) solid var(--color-2);
+  border-top: var(--border-width) solid var(--color-2);
+  border-bottom: var(--border-width) solid transparent;
+}
+
+nav > button {
+  background-color: var(--color-2);
+  color: var(--color-0);
+  border-style: solid;
+  border-color: var(--color-2);
+  border-width: 8px 4px;
+  transition: all 0.5s ease;
+  cursor: pointer;
+}
+
+nav > button.active {
+  background-color: var(--color-0);
+  color: var(--color-text);
+  border-width: 8px 4px;
+}
+
+#title {
+  position: absolute;
+  width: 100%;
+}
+
+.title {
+  position: absolute;
+  font-size: min(6vw, 2em);
+  text-align: center;
+  color: var(--color-3);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  transition: color 1s ease;
+  z-index: 2;
+}
+
+.title-echo {
+  position: absolute;
+  font-size: min(6.5vw, 2.2em);
+  text-align: center;
+  margin-top: calc(5% + 3em);
+  color: var(--color-0);
+  z-index: 9;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  opacity: 0;
+  text-shadow: 0 1px 4px var(--color-4), 0 1px 4px var(--color-4);
+  transition: opacity 1s ease;
+}
+
+#title.sources .title {
+  color: var(--color-1);
+  z-index: 0;
+}
+
+#title.sources .title-echo {
+  opacity: 1;
+}
+
+h2 {
+  font-size: 1.8em;
+  text-align: center;
+  margin: 8px;
+  color: var(--color-3);
+}
+
+h3 {
+  font-size: 1.4em;
+  text-align: center;
+  margin: 8px;
+}
+
+h4 {
+  font-size: 1.2em;
+  margin: 8px;
+}
+
+#explanation {
+  padding: 1em;
+  margin-top: 3em;
+  max-width: 30em;
+  background-color: var(--color-1);
+  position: relative;
+  transition: all 1s ease;
+  opacity: 0;
+  z-index: -10;
+  position: absolute;
+}
+#explanation.visible {
+  opacity: 1;
+  z-index: 0;
+}
+
+#explanation > #explanation-decoration {
+  position: absolute;
+  top: -90px;
+  left: 0;
+  height: 100px;
+  z-index: -1;
+}
+
+.text-content {
+  
+}
+
+input {
+  background: transparent;
+  border-style: solid;
+  border-color: var(--color-3);
+  border-width: 0 0 4px 4px;
+  padding: 0 4px;
+  font-size: 1em;
+  color: inherit;
+}
+
+input[type="number"] {
+  appearance: none;
+}
+
+input[type="checkbox"] {
+  display: none;
+}
+
+li {
+  margin-left: 1em;
+}
+
+.center {
+  text-align: center;
+}
+
+.resource-editor-container {
+  /**/display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  align-items: stretch;
+}
+
+.resource-editor-move,
+.resource-editor-enter-active,
+.resource-editor-leave-active {
+  transition: all 0.5s ease;
+}
+
+.resource-editor-enter-from {
+  opacity: 0;
+  transform: scaleX(0);
+}
+.resource-editor-leave-to {
+  opacity: 0;
+  transform: scaleX(0);
+}
+
+/* ensure leaving items are taken out of layout flow so that moving
+   animations can be calculated correctly. */
+.resource-editor-leave-active {
+  position: absolute;
+}
+
+.resource-editor {
+  padding: 20px;
+  margin: 10px;
+  border: 0 solid var(--color-3);
+  background-color: rgba(255,255,255,1);
+  border-width: 0 0 0 8px;
+  position: relative;
+  transition: all 0.5s ease;
+}
+
+.resource-editor.hidden {
+  transform: scaleX(0);
+  flex-shrink: 999;
+}
+
+.resource-editor > div {
+  margin: 4px;
+}
+
+#resource-editor-toggle-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  padding: 8px;
+}
+
+.toggle {
+  cursor: pointer;
+}
+
+.resource-editor-toggle {
+  padding: 10px;
+  margin: 6px;
+  background: transparent;
+  color: inherit;
+  user-select: none;
+}
+
+.resource-editor-toggle.active {
+  background: var(--color-3);
+  color: var(--color-0);
+}
+
+#form {
+  width: 100%;
+  margin-top: 3em;
+  padding: 1em 0;
+  transition: all 1s ease;
+  opacity: 1;
+  z-index: 9;
+}
+
+#form.hidden {
+  opacity: 0;
+  z-index: -3;
+}
+
+#results {
+  position: fixed;
+  bottom: 0;
+  margin: 4px;
+  text-align: center;
+  color: var(--color-0);
+  z-index: 5;
+  text-shadow: 0 1px 2px var(--color-4), 0 2px 3px var(--color-4);
+  transition: all 2s ease;
+}
+
+#results.hidden {
+  bottom: -100%;
+}
+
+p {
+  margin: 4px;
+}
+
+#forest {
+  position: fixed;
+  transition: all 2s ease;
+  bottom: 0;
+  height: 50%;
+  width: 100%;
+}
+
+#forest.full {
+  height: 80%;
+}
+#forest.high {
+  height: 30%;
+  bottom: 60%;
+}
+
+.horizon_layer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.horizon_layer > .background {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+}
+
+#horizon_layer_1 {
+  z-index: 1;
+}
+#horizon_layer_2 {
+  z-index: 2;
+}
+#horizon_layer_3 {
+  z-index: 3;
+}
+#horizon_layer_4 {
+  z-index: 4;
+}
+
+#horizon_layer_1 > .background {
+  background-color: var(--color-1);
+}
+#horizon_layer_2 > .background {
+  background-color: var(--color-2);
+}
+#horizon_layer_3 > .background {
+  background-color: var(--color-3);
+}
+#horizon_layer_4 > .background {
+  background-color: var(--color-4);
+}
+
+.ground {
+  position: absolute;
+  background-repeat: repeat-x;
+  background-position: bottom;
+  width: 100%;
+  height: 100px;
+}
+
+.horizon_layer img {
+  position: absolute;
+  bottom: 0;
+  transition: all 1s ease;
+}
+
+.aligned-trees-move,
+.aligned-trees-enter-active,
+.aligned-trees-leave-active {
+  transition: all 0.5s ease;
+}
+
+.aligned-trees-enter-from {
+  opacity: 0;
+  transform: translateY(50px);
+}
+.aligned-trees-leave-to {
+  opacity: 0;
+  transform: translateY(50px);
+}
+
+/* ensure leaving items are taken out of layout flow so that moving
+   animations can be calculated correctly. */
+.aligned-trees-leave-active {
+  position: absolute;
+}
+
+.form-enter-active,
+.form-leave-active {
+  transition: opacity 1s ease;
+}
+
+#sources {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  height: 0;
+  overflow-y: scroll;
+  background: var(--color-4);
+  transition: height 2s ease;
+  color: var(--color-0);
+  z-index: 9;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#sources.visible {
+  height: 60%;
+}

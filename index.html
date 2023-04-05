@@ -5,15 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Perfil energético y CO₂</title>
     <meta property="og:title" content="Perfil energético y CO₂">
-    <link href="style/reset.css" rel="stylesheet">
-    <link href="style/style.css" rel="stylesheet">
+    <link rel="stylesheet" href="style/reset.css">
+    <link rel="stylesheet" href="style/style.css">
+    <link rel="icon" href="img/icon.svg">
     <script src="script/vue.js"></script>
     <script src="script/script.js" defer></script>
   </head>
   <body>
     
     <main id="app">
-            
+      
+      <div style="display: none;">
+        <!-- this pre-loads the images -->
+        <template v-for="i in numberOfTreeVarieties">
+          <img v-for="j in 4" :src="'img/tree_' + i + '_' + (j-1) + '.svg'">
+        </template>
+      </div>
+
       <nav>
         <button
           v-for="view in views"
@@ -26,18 +34,18 @@
       </nav>
 
       <div id="title" :class="{ sources: currentViewId == 'sources' }">
-        <h1>{{ title }}</h1>
-        <div class="h1-echo">{{ title }}</div>
+        <div class="title">{{ title }}</div>
+        <div class="title-echo">{{ title }}</div>
       </div>
 
       <section id="explanation" :class="{ visible: currentViewId == 'explanation' }">
         <img id="explanation-decoration" :src="randomDecorativeTreeUrl">
-        <p>Explicación aquí.</p>
+        <p>Esta página permite calcular la huella de carbono equivalente a un perfil energético, así como el número de árboles aproximado que haría falta plantar cada año para compensar esta huella de carbono.</p>
       </section>
 
       <section id="form" :class="{ hidden: currentViewId != 'calculation' }">
 
-        <div>
+        <div class="center">
           <label>
             Nº de usuarios:
             <input type="number" v-model.number="numberOfUsers" min="1">
@@ -46,7 +54,7 @@
       
         <div>
           
-          <h3>Consumo:</h3>
+          <h3>Consumo anual:</h3>
           
           <div>
 
@@ -75,8 +83,8 @@
 
       </section>
 
-      <section id="results" v-show="currentViewId == 'calculation'">
-        <div v-if="true">
+      <section id="results" :class="{ hidden: currentViewId != 'calculation' }">
+        <div v-if="false">
           <p>Total CO₂ eq: {{ normalizeNumber(co2) }} kg (por usuario: {{ normalizeNumber(co2/numberOfUsers) }})</p>
           <p>Árboles equivalentes a este CO₂ eq: {{ normalizeNumber(numberOfTrees) }} (por usuario: {{ normalizeNumber(numberOfTrees/numberOfUsers) }})</p>
         </div>
