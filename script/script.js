@@ -269,15 +269,17 @@ const app = createApp({
   },
   template: `
     <div :class="[ 'resource-editor', { hidden: !active } ]" v-show="active">
-      <h3>{{ name }}</h3>
-      <div>
-        <input
-          type="text"
-          value="0"
-          min="0"
-          @input="changeAmount">
-        {{ unit }}
-      </div>
+      <label>
+        <h3>{{ name }}</h3>
+        <div>
+          <input
+            type="text"
+            value="0"
+            min="0"
+            @input="changeAmount">
+          {{ unit }}
+        </div>
+      </label>
       <div v-if="unit != 'kWh'">
         {{ normalizeNumber(amount) }} × {{ normalizeNumber(unitToKwh) }} = {{ normalizeNumber(kwh) }} kWh
       </div>
