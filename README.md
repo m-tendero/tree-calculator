@@ -8,3 +8,4 @@ It's in Spanish and it uses Spanish government data.
 1. Update sources
 2. Cite Sources
 3. Explain process
+4. Polish appearance
