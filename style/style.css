@@ -42,7 +42,7 @@ nav {
 #nav-decoration-1 {
   --border-width: 8px;
   position: absolute;
-  left: calc(var(--border-width) * -2 - 4px);
+  left: calc(var(--border-width) * -2 - 3px);
   top: 0;
   height: 0;
   width: 0;
@@ -56,7 +56,7 @@ nav {
   --border-width: 8px;
   position: absolute;
   right: -4px;
-  bottom: calc(var(--border-width) * -2);
+  bottom: calc(var(--border-width) * -2 + 1px);
   height: 0;
   width: 0;
   border-left: var(--border-width) solid transparent;
@@ -81,7 +81,12 @@ nav > button.active {
   border-width: 8px 4px;
 }
 
-h1 {
+#title {
+  position: absolute;
+  width: 100%;
+}
+
+.title {
   position: absolute;
   font-size: min(6vw, 2em);
   text-align: center;
@@ -93,25 +98,27 @@ h1 {
   z-index: 2;
 }
 
-.h1-echo {
+.title-echo {
   position: absolute;
-  font-size: 2.6em;
+  font-size: min(6.5vw, 2.2em);
   text-align: center;
-  margin-top: 10%;
+  margin-top: calc(5% + 3em);
   color: var(--color-0);
   z-index: 9;
   left: 50%;
   transform: translateX(-50%);
+  width: 90%;
   opacity: 0;
+  text-shadow: 0 1px 4px var(--color-4), 0 1px 4px var(--color-4);
   transition: opacity 1s ease;
 }
 
-#title.sources h1 {
+#title.sources .title {
   color: var(--color-1);
   z-index: 0;
 }
 
-#title.sources .h1-echo {
+#title.sources .title-echo {
   opacity: 1;
 }
 
@@ -124,13 +131,19 @@ h2 {
 
 h3 {
   font-size: 1.4em;
+  text-align: center;
+  margin: 8px;
+}
+
+h4 {
+  font-size: 1.2em;
   margin: 8px;
 }
 
 #explanation {
   padding: 1em;
   margin-top: 3em;
-  max-width: 10em;
+  max-width: 30em;
   background-color: var(--color-1);
   position: relative;
   transition: all 1s ease;
@@ -175,6 +188,10 @@ input[type="checkbox"] {
 
 li {
   margin-left: 1em;
+}
+
+.center {
+  text-align: center;
 }
 
 .resource-editor-container {
@@ -250,8 +267,9 @@ li {
 }
 
 #form {
+  width: 100%;
   margin-top: 3em;
-  padding: 20px;
+  padding: 1em 0;
   transition: all 1s ease;
   opacity: 1;
   z-index: 9;
@@ -265,13 +283,16 @@ li {
 #results {
   position: fixed;
   bottom: 0;
-  padding: 4px;
   margin: 4px;
-  width: 100%;
   text-align: center;
-  background-color: var(--color-4);
   color: var(--color-0);
   z-index: 5;
+  text-shadow: 0 1px 2px var(--color-4), 0 2px 3px var(--color-4);
+  transition: all 2s ease;
+}
+
+#results.hidden {
+  bottom: -100%;
 }
 
 p {
