@@ -1,5 +1,7 @@
+const KWH_PER_TERAJOULE = 277778;
+
 function normalizeNumber (n) {
-  return n.toLocaleString("es-ES", {minimumFractionDigits: 2}).replace(/,?0+$/, "")
+  return n.toLocaleString("es-ES", {maximumFractionDigits: 2, minimumFractionDigits: 2}).replace(/,?0+$/, "")
 }
 
 const { createApp } = Vue
@@ -11,15 +13,14 @@ const app = createApp({
       title: "Perfil energético y CO₂",
             
       numberOfUsers: 1,
-      
-      co2KgPerTree: 300,
-      
+            
       resources: {
         electicity: {
           name: "Electricidad",
           unit: "kWh",
           unitToKwh: 1,
-          kwhToCo2: 0.29,
+          co2KgPerTj: 0.16 * KWH_PER_TERAJOULE,
+          kwhToCo2Kg: 0.16,
           amount: 0,
           active: true,
         },
@@ -27,7 +28,9 @@ const app = createApp({
           name: "Gas natural",
           unit: "m³",
           unitToKwh: 10.73,
-          kwhToCo2: 0.2,
+          co2KgPerTj: 56100,
+          gjpci: 48.62,
+          kwhToCo2Kg: 0.2019598384321292,
           amount: 0,
           active: false,
         },
@@ -35,7 +38,9 @@ const app = createApp({
           name: "Carbón",
           unit: "kg",
           unitToKwh: 6.57,
-          kwhToCo2: 0.36,
+          co2KgPerTj: 100000,
+          gjpci: 27.34,// note: nacional
+          kwhToCo2Kg: 0.3599997120002304,
           amount: 0,
           active: false,
         },
@@ -43,7 +48,8 @@ const app = createApp({
           name: "Butano",
           unit: "kg",
           unitToKwh: 12.45,
-          kwhToCo2: 0.24,
+          co2KgPerTj: 64200,
+          kwhToCo2Kg: 0.23111981510414792,
           amount: 0,
           active: false,
         },
@@ -51,7 +57,8 @@ const app = createApp({
           name: "Propano",
           unit: "kg",
           unitToKwh: 12.45,
-          kwhToCo2: 0.24,
+          co2KgPerTj: 64000,
+          kwhToCo2Kg: 0.23039981568014745,
           amount: 0,
           active: false,
         },
@@ -59,7 +66,9 @@ const app = createApp({
           name: "Gasoil",
           unit: "l",
           unitToKwh: 11.80,
-          kwhToCo2: 0.24,
+          co2KgPerTj: 74100,
+          gjpci: 43,
+          kwhToCo2Kg: 0.2667597865921707,
           amount: 0,
           active: false,
         },
@@ -67,12 +76,37 @@ const app = createApp({
           name: "Gasolina",
           unit: "l",
           unitToKwh: 9.91,
-          kwhToCo2: 0.23,
+          kwhToCo2Kg: 0.24947980041615966,
+          co2KgPerTj: 69300,
           amount: 0,
           active: false,
         }
         
       },
+
+      treeSpecies: {
+        mix: {
+          name: "Mezcla de árboles",
+          treesPerHa: 200,
+          tCO2PerHaPerYear: 6
+        },
+        oak: {
+          name: "Roble (melojar)",
+          treesPerHa: 300,
+          tCO2PerHaPerYear: 5.6
+        },
+        pineC: {
+          name: "Pino carrasco",
+          treesPerHa: 115,
+          tCO2PerHaPerYear: 7.6
+        },
+        pineR: {
+          name: "Pino radiata",
+          treesPerHa: 105,
+          tCO2PerHaPerYear: 7.6
+        }
+      },
+      currentTreeSpeciesId: "mix",
       
       treeLayers: [
         {
@@ -117,7 +151,7 @@ const app = createApp({
         },
         sources: {
           id: "sources",
-          name: "Fuentes",
+          name: "...",
           forestHeightFactor: 3,
         },
       },
@@ -126,12 +160,16 @@ const app = createApp({
     }
   },
   computed: {
+    co2KgPerTree () {
+      const treeSp = this.treeSpecies[this.currentTreeSpeciesId];
+      return 1000 * treeSp.tCO2PerHaPerYear / treeSp.treesPerHa
+    },
     co2 () {
       let n = 0
       for (const k in this.resources) {
         const resource = this.resources[k];
         if (resource.active)
-          n += resource.amount * resource.unitToKwh * resource.kwhToCo2
+          n += resource.amount * resource.unitToKwh * resource.kwhToCo2Kg
       }
       return n
     },
@@ -168,9 +206,19 @@ const app = createApp({
     randomDecorativeTreeUrl () {
       return `img/tree_${ Math.floor(Math.random() * this.numberOfTreeVarieties) + 1 }_0.svg` 
     },
+
   },
   watch: {
     numberOfTreesRounded (newNumber, previousNumber) {
+      this.populateForest(newNumber, previousNumber)
+    },
+    currentTreeSpeciesId () {
+      this.trees.splice(0);
+      this.populateForest(this.numberOfTreesRounded, 0)
+    }
+  },
+  methods: {
+    populateForest (newNumber, previousNumber) {
       if (newNumber > previousNumber) {
         if (previousNumber < this.maxTrees) {
           if (newNumber > this.maxTrees) newNumber = this.maxTrees;
@@ -198,10 +246,14 @@ const app = createApp({
         }
       }
     },
-  },
-  methods: {
     getRandomTreeImage (layer) {
-      const imageNumber = Math.floor(Math.random() * this.numberOfTreeVarieties) + 1;
+      let imageNumber = Math.floor(Math.random() * this.numberOfTreeVarieties) + 1;
+      if (this.currentTreeSpeciesId == "pineR")
+        imageNumber = 5;
+      else if (this.currentTreeSpeciesId == "pineC")
+        imageNumber = 4;
+      else if (this.currentTreeSpeciesId == "oak")
+        imageNumber = 1;
       return "img/tree_" + imageNumber + "_" + layer + ".svg"
     },
     getRandomLayer () {
@@ -233,8 +285,9 @@ const app = createApp({
     name: String,
     unit: String,
     unitToKwh: Number,
-    kwhToCo2: Number,
+    kwhToCo2Kg: Number,
     amount: Number,
+    co2KgPerTj: Number,
     active: Boolean
   },
   computed: {
@@ -242,7 +295,7 @@ const app = createApp({
       return this.amount * this.unitToKwh
     },
     co2 () {
-      return this.kwh * this.kwhToCo2
+      return this.kwh * this.kwhToCo2Kg
     }
   },
   methods: {
@@ -268,7 +321,7 @@ const app = createApp({
     normalizeNumber
   },
   template: `
-    <div :class="[ 'resource-editor', { hidden: !active } ]" v-show="active">
+    <div :class="[ 'resource-editor', { hidden: !active } ]">
       <label>
         <h3>{{ name }}</h3>
         <div>
@@ -284,7 +337,7 @@ const app = createApp({
         {{ normalizeNumber(amount) }} × {{ normalizeNumber(unitToKwh) }} = {{ normalizeNumber(kwh) }} kWh
       </div>
       <div>
-        {{ normalizeNumber(kwh) }} × {{ normalizeNumber(kwhToCo2) }} = {{ normalizeNumber(co2) }} kg CO₂ eq
+        {{ normalizeNumber(kwh) }} × {{ normalizeNumber(kwhToCo2Kg) }} = {{ normalizeNumber(co2) }} kg CO₂ eq
       </div>
     </div>
   `
