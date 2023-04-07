@@ -12,6 +12,8 @@
 * {
   font-family: inherit;
   font-size: inherit;
+  font-color: inherit;
+  scrollbar-color: var(--color-4) var(--color-2);
 }
 
 body {
@@ -19,6 +21,11 @@ body {
   color: var(--color-text);
   font-family: 'Montserrat', Century Gothic, verdana, sans-serif;
   font-size: 18px;
+  overflow-y: scroll;  
+}
+
+[v-cloak] {
+  display: none;
 }
 
 main#app {
@@ -65,7 +72,9 @@ nav {
   border-bottom: var(--border-width) solid transparent;
 }
 
-nav > button {
+nav > a {
+  display: inline-block;
+  padding: 4px;
   background-color: var(--color-2);
   color: var(--color-0);
   border-style: solid;
@@ -73,16 +82,16 @@ nav > button {
   border-width: 8px 4px;
   transition: all 0.5s ease;
   cursor: pointer;
+  text-decoration: none;
 }
 
-nav > button.active {
+nav > a.active {
   background-color: var(--color-0);
   color: var(--color-text);
   border-width: 8px 4px;
 }
 
 #title {
-  position: absolute;
   width: 100%;
 }
 
@@ -94,23 +103,27 @@ nav > button.active {
   left: 50%;
   transform: translateX(-50%);
   width: 90%;
-  transition: color 1s ease;
-  z-index: 2;
+  transition: all 1s ease;
+  z-index: 9;
 }
 
 .title-echo {
   position: absolute;
   font-size: min(6.5vw, 2.2em);
   text-align: center;
-  margin-top: calc(5% + 3em);
   color: var(--color-0);
   z-index: 9;
+  top: calc(40% - 2 * min(6.5vw, 2.2em));
   left: 50%;
   transform: translateX(-50%);
   width: 90%;
   opacity: 0;
   text-shadow: 0 1px 4px var(--color-4), 0 1px 4px var(--color-4);
   transition: opacity 1s ease;
+}
+
+#title.forest .title {
+  opacity: 0;
 }
 
 #title.sources .title {
@@ -141,19 +154,21 @@ h4 {
 }
 
 #explanation {
-  padding: 1em;
-  margin-top: 3em;
+  padding: 1em 1em 2em 1em;
+  margin: 3em 0;
   max-width: 30em;
   background-color: var(--color-1);
   position: relative;
   transition: all 1s ease;
+  position: absolute;
+  opacity: 1;
+  z-index: 8;
+}
+#explanation.hidden {
+  position: fixed;
   opacity: 0;
   z-index: -10;
-  position: absolute;
-}
-#explanation.visible {
-  opacity: 1;
-  z-index: 0;
+  max-height: 80%;
 }
 
 #explanation > #explanation-decoration {
@@ -161,11 +176,31 @@ h4 {
   top: -90px;
   left: 0;
   height: 100px;
-  z-index: -1;
 }
 
-.text-content {
-  
+#explanation > p {
+  margin: 1em 0;
+}
+
+#explanation > ul li {
+  list-style-type: square;
+  margin-top: 1em;
+}
+
+#explanation > ul li::marker {
+  margin-right: .5rem;
+  color: var(--color-3);
+}
+
+#start-button {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background-color: var(--color-3);
+  color: var(--color-0);
+  border: none;
+  padding: 4px;
+  cursor: pointer;
 }
 
 input {
@@ -186,6 +221,13 @@ input[type="checkbox"] {
   display: none;
 }
 
+select {
+  background: transparent;
+  border-style: solid;
+  border-color: var(--color-3);
+  border-width: 4px 0;
+}
+
 li {
   margin-left: 1em;
 }
@@ -199,22 +241,13 @@ li {
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: space-evenly;
-  align-items: stretch;
+  align-items: center;
 }
 
 .resource-editor-move,
 .resource-editor-enter-active,
 .resource-editor-leave-active {
   transition: all 0.5s ease;
-}
-
-.resource-editor-enter-from {
-  opacity: 0;
-  transform: scaleX(0);
-}
-.resource-editor-leave-to {
-  opacity: 0;
-  transform: scaleX(0);
 }
 
 /* ensure leaving items are taken out of layout flow so that moving
@@ -235,7 +268,7 @@ li {
 
 .resource-editor.hidden {
   transform: scaleX(0);
-  flex-shrink: 999;
+  display: none;
 }
 
 .resource-editor > div {
@@ -277,7 +310,17 @@ li {
 
 #form.hidden {
   opacity: 0;
-  z-index: -3;
+  z-index: -3
+}
+
+#form #general-inputs {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+}
+
+#form #general-inputs input[type="number"] {
+  width: 5em;
 }
 
 #results {
@@ -369,22 +412,19 @@ p {
 .horizon_layer img {
   position: absolute;
   bottom: 0;
-  transition: all 1s ease;
+  transition: opacity 1s ease;
 }
 
-.aligned-trees-move,
 .aligned-trees-enter-active,
 .aligned-trees-leave-active {
-  transition: all 0.5s ease;
+  transition: opacity 0.5s ease;
 }
 
 .aligned-trees-enter-from {
   opacity: 0;
-  transform: translateY(50px);
 }
 .aligned-trees-leave-to {
   opacity: 0;
-  transform: translateY(50px);
 }
 
 /* ensure leaving items are taken out of layout flow so that moving
@@ -402,10 +442,12 @@ p {
   position: fixed;
   bottom: 0;
   width: 100%;
-  height: 0;
+  height: 60%;
+  padding: 0 1em;
   overflow-y: scroll;
+  scrollbar-color: var(--color-1) transparent;
   background: var(--color-4);
-  transition: height 2s ease;
+  transition: height 2s ease, padding 2s ease;
   color: var(--color-0);
   z-index: 9;
   display: flex;
@@ -413,6 +455,21 @@ p {
   align-items: center;
 }
 
-#sources.visible {
-  height: 60%;
+#sources.hidden {
+  height: 0;
+  padding: 0;
+}
+
+#sources ul li {
+  list-style-type: square;
+}
+
+#sources ul li::marker {
+  margin-right: .5rem;
+  color: var(--color-2);
+}
+
+#sources a {
+  color: var(--color-2);
+  text-decoration: none;
 }
