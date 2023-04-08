@@ -13,7 +13,6 @@
   font-family: inherit;
   font-size: inherit;
   font-color: inherit;
-  scrollbar-color: var(--color-4) var(--color-2);
 }
 
 body {
@@ -21,14 +20,14 @@ body {
   color: var(--color-text);
   font-family: 'Montserrat', Century Gothic, verdana, sans-serif;
   font-size: 18px;
-  overflow-y: scroll;  
+  scrollbar-color: var(--color-4) var(--color-2);
 }
 
 [v-cloak] {
   display: none;
 }
 
-main#app {
+#view {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -93,46 +92,32 @@ nav > a.active {
 
 #title {
   width: 100%;
-}
-
-.title {
-  position: absolute;
+  position: fixed;
   font-size: min(6vw, 2em);
   text-align: center;
-  color: var(--color-3);
   left: 50%;
   transform: translateX(-50%);
   width: 90%;
   transition: all 1s ease;
   z-index: 9;
+  text-shadow: 0 0 1px var(--color-0), 0 0 3px var(--color-0), 0 0 6px var(--color-0);
 }
 
-.title-echo {
-  position: absolute;
-  font-size: min(6.5vw, 2.2em);
-  text-align: center;
-  color: var(--color-0);
-  z-index: 9;
-  top: calc(40% - 2 * min(6.5vw, 2.2em));
-  left: 50%;
-  transform: translateX(-50%);
-  width: 90%;
-  opacity: 0;
-  text-shadow: 0 1px 4px var(--color-4), 0 1px 4px var(--color-4);
-  transition: opacity 1s ease;
+#view.explanation #title {
+  color: var(--color-4);
 }
 
-#title.forest .title {
-  opacity: 0;
+#view.calculation #title {
+  color: var(--color-3);
 }
 
-#title.sources .title {
+#view.forest #title {
+  color: var(--color-2);
+}
+
+#view.more #title {
   color: var(--color-1);
   z-index: 0;
-}
-
-#title.sources .title-echo {
-  opacity: 1;
 }
 
 h2 {
@@ -164,7 +149,7 @@ h4 {
   opacity: 1;
   z-index: 8;
 }
-#explanation.hidden {
+#view:not(.explanation) #explanation {
   position: fixed;
   opacity: 0;
   z-index: -10;
@@ -267,7 +252,6 @@ li {
 }
 
 .resource-editor.hidden {
-  transform: scaleX(0);
   display: none;
 }
 
@@ -308,7 +292,7 @@ li {
   z-index: 9;
 }
 
-#form.hidden {
+#view:not(.calculation) #form {
   opacity: 0;
   z-index: -3
 }
@@ -317,6 +301,10 @@ li {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-evenly;
+}
+
+#form #general-inputs div {
+  margin: 4px;
 }
 
 #form #general-inputs input[type="number"] {
@@ -334,7 +322,7 @@ li {
   transition: all 2s ease;
 }
 
-#results.hidden {
+#view:not(.calculation) #results {
   bottom: -100%;
 }
 
@@ -350,10 +338,10 @@ p {
   width: 100%;
 }
 
-#forest.full {
+#view.forest #forest {
   height: 80%;
 }
-#forest.high {
+#view.more #forest {
   height: 30%;
   bottom: 60%;
 }
@@ -438,7 +426,7 @@ p {
   transition: opacity 1s ease;
 }
 
-#sources {
+#more {
   position: fixed;
   bottom: 0;
   width: 100%;
@@ -451,25 +439,34 @@ p {
   color: var(--color-0);
   z-index: 9;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  flex-wrap: wrap;
   align-items: center;
 }
 
-#sources.hidden {
+#more > div {
+  margin: 8px;
+}
+
+#view:not(.more) #more {
   height: 0;
   padding: 0;
 }
 
-#sources ul li {
+#more ul li {
   list-style-type: square;
 }
 
-#sources ul li::marker {
+#more ul li::marker {
   margin-right: .5rem;
   color: var(--color-2);
 }
 
-#sources a {
+#more a {
   color: var(--color-2);
   text-decoration: none;
+}
+
+#more a:hover {
+  color: var(--color-1);
 }
