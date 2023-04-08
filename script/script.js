@@ -1,5 +1,3 @@
-const KWH_PER_TERAJOULE = 277778;
-
 function normalizeNumber (n) {
   return n.toLocaleString("es-ES", {maximumFractionDigits: 2, minimumFractionDigits: 2}).replace(/,?0+$/, "")
 }
@@ -12,6 +10,35 @@ const app = createApp({
 
       title: "Perfil energético y CO₂",
             
+      // Interface
+
+      views: {
+        explanation: {
+          key: "explanation",
+          name: "?",
+          forestHeightFactor: 0,
+        },
+        calculation: {
+          key: "calculation",
+          name: "Cálculo",
+          forestHeightFactor: 5,
+        },
+        forest: {
+          key: "forest",
+          name: "Bosque",
+          forestHeightFactor: 8,
+        },
+        more: {
+          key: "more",
+          name: "...",
+          forestHeightFactor: 3,
+        },
+      },
+
+      currentViewKey: "explanation",
+
+      // Data
+
       numberOfUsers: 1,
             
       resources: {
@@ -19,7 +46,6 @@ const app = createApp({
           name: "Electricidad",
           unit: "kWh",
           unitToKwh: 1,
-          co2KgPerTj: 0.16 * KWH_PER_TERAJOULE,
           kwhToCo2Kg: 0.16,
           amount: 0,
           active: true,
@@ -28,8 +54,6 @@ const app = createApp({
           name: "Gas natural",
           unit: "m³",
           unitToKwh: 10.73,
-          co2KgPerTj: 56100,
-          gjpci: 48.62,
           kwhToCo2Kg: 0.2019598384321292,
           amount: 0,
           active: false,
@@ -38,8 +62,6 @@ const app = createApp({
           name: "Carbón",
           unit: "kg",
           unitToKwh: 6.57,
-          co2KgPerTj: 100000,
-          gjpci: 27.34,// note: nacional
           kwhToCo2Kg: 0.3599997120002304,
           amount: 0,
           active: false,
@@ -48,7 +70,6 @@ const app = createApp({
           name: "Butano",
           unit: "kg",
           unitToKwh: 12.45,
-          co2KgPerTj: 64200,
           kwhToCo2Kg: 0.23111981510414792,
           amount: 0,
           active: false,
@@ -57,7 +78,6 @@ const app = createApp({
           name: "Propano",
           unit: "kg",
           unitToKwh: 12.45,
-          co2KgPerTj: 64000,
           kwhToCo2Kg: 0.23039981568014745,
           amount: 0,
           active: false,
@@ -66,8 +86,6 @@ const app = createApp({
           name: "Gasoil",
           unit: "l",
           unitToKwh: 11.80,
-          co2KgPerTj: 74100,
-          gjpci: 43,
           kwhToCo2Kg: 0.2667597865921707,
           amount: 0,
           active: false,
@@ -77,7 +95,6 @@ const app = createApp({
           unit: "l",
           unitToKwh: 9.91,
           kwhToCo2Kg: 0.24947980041615966,
-          co2KgPerTj: 69300,
           amount: 0,
           active: false,
         }
@@ -106,8 +123,15 @@ const app = createApp({
           tCO2PerHaPerYear: 7.6
         }
       },
-      currentTreeSpeciesId: "mix",
+
+      currentTreeSpeciesKey: "mix",
       
+      // Appearance
+
+      numberOfTreeVarieties: 8,
+
+      maxTrees: 400,
+
       treeLayers: [
         {
           height: 90,
@@ -128,40 +152,12 @@ const app = createApp({
       ],
       
       trees: [],
-      
-      maxTrees: 400,
-      
-      numberOfTreeVarieties: 8,
 
-      views: {
-        explanation: {
-          key: "explanation",
-          name: "?",
-          forestHeightFactor: 0,
-        },
-        calculation: {
-          key: "calculation",
-          name: "Cálculo",
-          forestHeightFactor: 5,
-        },
-        forest: {
-          key: "forest",
-          name: "Bosque",
-          forestHeightFactor: 8,
-        },
-        more: {
-          key: "more",
-          name: "...",
-          forestHeightFactor: 3,
-        },
-      },
-
-      currentViewKey: "explanation",
     }
   },
   computed: {
     co2KgPerTree () {
-      const treeSp = this.treeSpecies[this.currentTreeSpeciesId];
+      const treeSp = this.treeSpecies[this.currentTreeSpeciesKey];
       return 1000 * treeSp.tCO2PerHaPerYear / treeSp.treesPerHa
     },
     co2 () {
@@ -212,7 +208,7 @@ const app = createApp({
     numberOfTreesRounded (newNumber, previousNumber) {
       this.populateForest(newNumber, previousNumber)
     },
-    currentTreeSpeciesId () {
+    currentTreeSpeciesKey () {
       this.trees.splice(0);
       this.populateForest(this.numberOfTreesRounded, 0)
     }
@@ -248,11 +244,11 @@ const app = createApp({
     },
     getRandomTreeImage (layer) {
       let imageNumber = Math.floor(Math.random() * this.numberOfTreeVarieties) + 1;
-      if (this.currentTreeSpeciesId == "pineR")
+      if (this.currentTreeSpeciesKey == "pineR")
         imageNumber = 5;
-      else if (this.currentTreeSpeciesId == "pineC")
+      else if (this.currentTreeSpeciesKey == "pineC")
         imageNumber = 4;
-      else if (this.currentTreeSpeciesId == "oak")
+      else if (this.currentTreeSpeciesKey == "oak")
         imageNumber = 1;
       return "img/tree_" + imageNumber + "_" + layer + ".svg"
     },
@@ -287,7 +283,6 @@ const app = createApp({
     unitToKwh: Number,
     kwhToCo2Kg: Number,
     amount: Number,
-    co2KgPerTj: Number,
     active: Boolean
   },
   computed: {
