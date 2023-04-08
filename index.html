@@ -14,7 +14,7 @@
   <body>
     
     <main id="app" v-cloak>
-      
+
       <div style="display: none;">
         <!-- this pre-loads the images -->
         <template v-for="i in numberOfTreeVarieties">
@@ -22,142 +22,148 @@
         </template>
       </div>
 
-      <nav>
-        <a
-          v-for="view in views"
-          @click="currentViewId = view.id"
-          :class="{ active: currentViewId == view.id }"
-          href="#">
-          {{ view.name }}    
-        </a>
-        <div id="nav-decoration-1"></div>
-        <div id="nav-decoration-2"></div>
-      </nav>
+      <div id="view" :class="currentViewKey">
+        
+        <nav>
+          <a
+            v-for="view in views"
+            @click="currentViewKey = view.key"
+            :class="{ active: currentViewKey == view.key }"
+            href="#">
+            {{ view.name }}    
+          </a>
+          <div id="nav-decoration-1"></div>
+          <div id="nav-decoration-2"></div>
+        </nav>
 
-      <div id="title" :class="{ sources: currentViewId == 'sources', forest: currentViewId == 'forest' }">
-        <div class="title">{{ title }}</div>
-        <div class="title-echo">{{ title }}</div>
-      </div>
+        <div id="title">{{ title }}</div>
 
-      <section id="explanation" :class="{ hidden: currentViewId != 'explanation' }">
-        <img id="explanation-decoration" :src="randomDecorativeTreeUrl">
-        <p>Esta página permite calcular la emisión de CO₂ equivalente aproximada para un perfil energético, así como el número de árboles aproximado que haría falta plantar para compensarla.</p>
-        <p>Consideraciones:</p>
-        <ul>
-          <li>Este análisis se centra en España. Las especies de árboles consideradas son comunes en la península ibérica, y sus densidades proceden de datos del gobierno de España.</li>
-          <li>Este análisis se limita a bosques replantados de menos de 20 años de edad, ya que el balance de gases de efecto invernadero de los bosques maduros es más complejo.</li>
-          <li>Algunos árboles absorben más de 10 veces más CO₂ que otros (según la especie y la localización geográfica).</li>
-          <li>Los bosques que promueven el equilibrio ecológico del planeta son los más complejos. Cuando se maximiza la producción de una sola especie se reducen factores como la biodiversidad o la resiliencia.</li>
-          <li>El uso de combustibles produce otras formas de contaminación que no están incluidas en este análisis y tienen un impacto en la salud humana, la acidificación, la eutrofización y la oxidación fotoquímica.</li>
-        </ul>
-        <button id="start-button" @click="currentViewId = 'calculation'">Empezar</button>
-      </section>
+        <section id="explanation">
+          <img id="explanation-decoration" :src="randomDecorativeTreeUrl">
+          <p>Esta página permite calcular la emisión de CO₂ equivalente aproximada para un perfil energético, así como el número de árboles aproximado que haría falta plantar para compensarla.</p>
+          <p>Consideraciones:</p>
+          <ul>
+            <li>Este análisis se centra en España. Las especies de árboles consideradas son comunes en la península ibérica, y sus densidades proceden de datos del gobierno de España.</li>
+            <li>Este análisis se limita a bosques replantados de menos de 20 años de edad, ya que el balance de gases de efecto invernadero de los bosques maduros es más complejo.</li>
+            <li>Algunos árboles absorben más de 10 veces más CO₂ que otros (según la especie y la localización geográfica).</li>
+            <li>Los bosques que promueven el equilibrio ecológico del planeta son los más complejos. Cuando se maximiza la producción de una sola especie se reducen factores como la biodiversidad o la resiliencia.</li>
+            <li>El uso de combustibles produce otras formas de contaminación que no están incluidas en este análisis y tienen un impacto en la salud humana, la acidificación, la eutrofización y la oxidación fotoquímica.</li>
+          </ul>
+          <button id="start-button" @click="currentViewKey = 'calculation'">Empezar</button>
+        </section>
 
-      <section id="form" :class="{ hidden: currentViewId != 'calculation' }">
+        <section id="form">
 
-        <div id="general-inputs">
+          <div id="general-inputs">
 
-          <div>
-            <label>
-              Nº de usuarios:
-              <input type="number" v-model.number="numberOfUsers" min="1">
-            </label>
-          </div>
-      
-          <div>
-            Tipo de árbol:
-            <select v-model="currentTreeSpeciesId">
-              <option v-for="(treeSpecies, k) in treeSpecies" :value="k">{{ treeSpecies.name }}</option>
-            </select>
-          </div>
-
-        </div>
-
-        <div>
-          
-          <h3>Consumo anual:</h3>
-          
-          <div>
-
-            <div id="resource-editor-toggle-container"> 
-              <label
-                v-for="resource in resources"
-                :class="[ 'toggle', 'resource-editor-toggle', { active: resource.active } ]">
-                <input type="checkbox" v-model.number="resource.active">{{ resource.name }}
+            <div>
+              <label>
+                Nº de usuarios:
+                <input type="number" v-model.number="numberOfUsers" min="1">
               </label>
             </div>
-            
-            <transition-group
-                tag="div"
-                name="resource-editor"
-                class="resource-editor-container">
-              <resource-editor
-                  v-for="resource in resources"
-                  :key="resource.name"
-                  v-bind="resource"
-                  @change-amount="(n) => resource.amount = n"></resource-editor>
-            </transition-group>
-
-          </div>
         
-        </div>
+            <div>
+              <label>
+                Tipo de árbol:
+                <select v-model="currentTreeSpeciesId">
+                  <option v-for="(treeSpecies, k) in treeSpecies" :value="k">{{ treeSpecies.name }}</option>
+                </select>
+              </label>
+            </div>
 
-      </section>
-
-      <section id="results" :class="{ hidden: currentViewId != 'calculation' }">
-        <div v-if="false">
-          <p>Total CO₂ eq: {{ normalizeNumber(co2) }} kg (por usuario: {{ normalizeNumber(co2/numberOfUsers) }})</p>
-          <p>Árboles equivalentes a este CO₂ eq: {{ normalizeNumber(numberOfTrees) }} (por usuario: {{ normalizeNumber(numberOfTrees/numberOfUsers) }})</p>
-        </div>
-        <div v-else>
-          <p>Total kg de CO₂ equivalente al consumo: {{ normalizeNumber(co2) }} kg. Árboles equivalentes a este CO₂ eq: {{ normalizeNumber(numberOfTrees) }}</p>
-          <p>(Por usuario: {{ normalizeNumber(co2/numberOfUsers) }} kg de CO₂ eq, {{ normalizeNumber(numberOfTrees/numberOfUsers) }} árboles)</p>
-        </div>
-      </section>
-      
-      <section
-        id="forest"
-        :class="{ full: currentViewId == 'forest', high: currentViewId == 'sources' }"
-        :style="{ height: forestHeight }">
-        <div
-          v-for="(layer, i) in treeLayers"
-          class="horizon_layer"
-          :id="'horizon_layer_' + (i + 1)" >
-          <div
-            class="background"
-            :style="{ height: layer.height + '%' }">
           </div>
-          <div class="ground" :style="getGroundStyle(layer, i)"></div>
-          <transition-group
-            tag="div"
-            name="aligned-trees"
-            class="aligned-trees">
-            <template v-for="tree in trees">
-              <img
-                v-if="tree.layer == i"
-                :src="tree.image"
-                :style="generateTreeStyle(tree, layer)">
-            </template>
-          </transition-group>
-          
-        </div>
-          
-      </section>
 
-      <section id="sources" :class="{ hidden: currentViewId != 'sources' }">
-        <h2>Fuentes:</h2>
-        <div class="text-content">
-          <ul>
-            <li>Factores de emisión de CO₂ y poderes caloríficos por defecto para la combustión estacionaria por tipo de combustible: <a href="https://www.ipcc-nggip.iges.or.jp/public/2006gl/spanish/pdf/2_Volume2/V2_2_Ch2_Stationary_Combustion.pdf">Directrices del IPCC de 2006 para los inventarios nacionales de gases de efecto invernadero - Volumen 2: Energía (2006)</a></li>
-            <li>Estos datos siendo citados por el gobierno más recientemente (2022): <a href="https://www.miteco.gob.es/es/calidad-y-evaluacion-ambiental/temas/sistema-espanol-de-inventario-sei-/es_nir_edicion2022_tcm30-523942.pdf#%5B%7B%22num%22%3A2766%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C0%2C841.92%2C0%5D">Informe de Inventario Nacional de Emisiones de Gases de Efecto Invernadero</a></li>
-            <li>Factor de emisión del mix eléctrico español (2022): <a href="https://www.ree.es/es/datos/generacion/no-renovables-detalle-emisiones-CO2?start_date=2022-01-01T00:00&end_date=2022-12-31T23:59&time_trunc=year&systemElectric=nacional">Consulta guiada de la Red Eléctrica</a></li>
-            <li>CO₂ capturado durante los primeros 20 años de crecimiento de árboles replantados (por hectárea): <a href="https://cbmjournal.biomedcentral.com/articles/10.1186/s13021-018-0110-8/figures/2">Global carbon dioxide removal rates from forest landscape restoration activities (2018)</a></li>
-            <li>Densidad de árboles de los bosques españoles: <a href="https://www.miteco.gob.es/es/biodiversidad/temas/inventarios-nacionales/inventario-forestal-nacional/index.aspx">Inventario Forestal Nacional - Bosques españoles y su evolución</a></li>
-            <!--li><a href="https://climate.mit.edu/ask-mit/how-many-new-trees-would-we-need-offset-our-carbon-emissions"></a></li-->
-          </ul>
-        </div>
-      </section>
+          <div>
+            
+            <h3>Consumo anual:</h3>
+            
+            <div>
+
+              <div id="resource-editor-toggle-container"> 
+                <label
+                  v-for="resource in resources"
+                  :class="[ 'toggle', 'resource-editor-toggle', { active: resource.active } ]">
+                  <input type="checkbox" v-model.number="resource.active">{{ resource.name }}
+                </label>
+              </div>
+              
+              <transition-group
+                  tag="div"
+                  name="resource-editor"
+                  class="resource-editor-container">
+                <resource-editor
+                    v-for="resource in resources"
+                    :key="resource.name"
+                    v-bind="resource"
+                    @change-amount="(n) => resource.amount = n"></resource-editor>
+              </transition-group>
+
+            </div>
+          
+          </div>
+
+        </section>
+
+        <section id="results">
+          <div v-if="false">
+            <p>Total CO₂ eq: {{ normalizeNumber(co2) }} kg (por usuario: {{ normalizeNumber(co2/numberOfUsers) }})</p>
+            <p>Árboles equivalentes a este CO₂ eq: {{ normalizeNumber(numberOfTrees) }} (por usuario: {{ normalizeNumber(numberOfTrees/numberOfUsers) }})</p>
+          </div>
+          <div v-else>
+            <p>Total kg de CO₂ equivalente al consumo: {{ normalizeNumber(co2) }} kg. Árboles equivalentes a este CO₂ eq: {{ normalizeNumber(numberOfTrees) }}</p>
+            <p>(Por usuario: {{ normalizeNumber(co2/numberOfUsers) }} kg de CO₂ eq, {{ normalizeNumber(numberOfTrees/numberOfUsers) }} árboles)</p>
+          </div>
+        </section>
+        
+        <section
+          id="forest"
+          :class="{ forest: currentViewKey == 'forest', more: currentViewKey == 'more' }"
+          :style="{ height: forestHeight }">
+          <div
+            v-for="(layer, i) in treeLayers"
+            class="horizon_layer"
+            :id="'horizon_layer_' + (i + 1)" >
+            <div
+              class="background"
+              :style="{ height: layer.height + '%' }">
+            </div>
+            <div class="ground" :style="getGroundStyle(layer, i)"></div>
+            <transition-group
+              tag="div"
+              name="aligned-trees"
+              class="aligned-trees">
+              <template v-for="tree in trees">
+                <img
+                  v-if="tree.layer == i"
+                  :src="tree.image"
+                  :style="generateTreeStyle(tree, layer)">
+              </template>
+            </transition-group>
+            
+          </div>
+            
+        </section>
+
+        <section id="more">
+          <div id="sources">
+            <h2>Fuentes</h2>
+            <ul>
+              <li>Factores de emisión de CO₂ y poderes caloríficos por defecto para la combustión estacionaria por tipo de combustible (2006): <a href="https://www.ipcc-nggip.iges.or.jp/public/2006gl/spanish/pdf/2_Volume2/V2_2_Ch2_Stationary_Combustion.pdf">Directrices del IPCC de 2006 para los inventarios nacionales de gases de efecto invernadero - Volumen 2: Energía</a></li>
+              <li>Estos datos siendo citados por el gobierno más recientemente (2022): <a href="https://www.miteco.gob.es/es/calidad-y-evaluacion-ambiental/temas/sistema-espanol-de-inventario-sei-/es_nir_edicion2022_tcm30-523942.pdf#%5B%7B%22num%22%3A2766%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C0%2C841.92%2C0%5D">Informe de Inventario Nacional de Emisiones de Gases de Efecto Invernadero</a></li>
+              <li>Factor de emisión del mix eléctrico español (2022): <a href="https://www.ree.es/es/datos/generacion/no-renovables-detalle-emisiones-CO2?start_date=2022-01-01T00:00&end_date=2022-12-31T23:59&time_trunc=year&systemElectric=nacional">Consulta guiada de la Red Eléctrica</a></li>
+              <li>CO₂ capturado por hectárea durante los primeros 20 años de crecimiento de árboles replantados (2018): <a href="https://cbmjournal.biomedcentral.com/articles/10.1186/s13021-018-0110-8/figures/2">Global carbon dioxide removal rates from forest landscape restoration activities</a></li>
+              <li>Densidad de árboles de los bosques españoles (2007): <a href="https://www.miteco.gob.es/es/biodiversidad/temas/inventarios-nacionales/inventario-forestal-nacional/index.aspx">Inventario Forestal Nacional - Bosques españoles y su evolución</a></li>
+              <!--li><a href="https://climate.mit.edu/ask-mit/how-many-new-trees-would-we-need-offset-our-carbon-emissions"></a></li-->
+            </ul>
+          </div>
+          <div id="etc">
+            <a href="https://github.com/m-tendero/tree-calculator">Este proyecto en Github</a>
+          </div>
+        </section>
       
+      </div>
+
     </main>
   </body>
 </html>
