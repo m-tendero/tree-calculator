@@ -36,7 +36,64 @@
           <div id="nav-decoration-2"></div>
         </nav>
 
-        <div id="title">{{ title }}</div>
+        <div id="main-content-block">
+
+          <div id="title">{{ title }}</div>
+
+          <section id="form">
+
+            <div id="general-inputs">
+
+              <div>
+                <label>
+                  Nº de usuarios:
+                  <input type="number" v-model.number="numberOfUsers" min="1">
+                </label>
+              </div>
+          
+              <div>
+                <label>
+                  Tipo de árbol:
+                  <select v-model="currentTreeSpeciesKey">
+                    <option v-for="(treeSpecies, k) in treeSpecies" :value="k">{{ treeSpecies.name }}</option>
+                  </select>
+                </label>
+              </div>
+
+            </div>
+
+            <div>
+              
+              <h3>Consumo anual:</h3>
+              
+              <div>
+
+                <div id="resource-editor-toggle-container"> 
+                  <label
+                    v-for="resource in resources"
+                    :class="[ 'toggle', 'resource-editor-toggle', { active: resource.active } ]">
+                    <input type="checkbox" v-model.number="resource.active">{{ resource.name }}
+                  </label>
+                </div>
+                
+                <transition-group
+                    tag="div"
+                    name="resource-editor"
+                    class="resource-editor-container">
+                  <resource-editor
+                      v-for="resource in resources"
+                      :key="resource.name"
+                      v-bind="resource"
+                      @change-amount="(n) => resource.amount = n"></resource-editor>
+                </transition-group>
+
+              </div>
+            
+            </div>
+
+          </section>
+
+        </div>
 
         <section id="explanation">
           <img id="explanation-decoration" :src="randomDecorativeTreeUrl">
@@ -49,71 +106,12 @@
             <li>Los bosques que promueven el equilibrio ecológico del planeta son los más complejos. Cuando se maximiza la producción de una sola especie se reducen factores como la biodiversidad o la resiliencia.</li>
             <li>El uso de combustibles produce otras formas de contaminación que no están incluidas en este análisis y tienen un impacto en la salud humana, la acidificación, la eutrofización y la oxidación fotoquímica.</li>
           </ul>
-          <button id="start-button" @click="currentViewKey = 'calculation'">Empezar</button>
-        </section>
-
-        <section id="form">
-
-          <div id="general-inputs">
-
-            <div>
-              <label>
-                Nº de usuarios:
-                <input type="number" v-model.number="numberOfUsers" min="1">
-              </label>
-            </div>
-        
-            <div>
-              <label>
-                Tipo de árbol:
-                <select v-model="currentTreeSpeciesId">
-                  <option v-for="(treeSpecies, k) in treeSpecies" :value="k">{{ treeSpecies.name }}</option>
-                </select>
-              </label>
-            </div>
-
-          </div>
-
-          <div>
-            
-            <h3>Consumo anual:</h3>
-            
-            <div>
-
-              <div id="resource-editor-toggle-container"> 
-                <label
-                  v-for="resource in resources"
-                  :class="[ 'toggle', 'resource-editor-toggle', { active: resource.active } ]">
-                  <input type="checkbox" v-model.number="resource.active">{{ resource.name }}
-                </label>
-              </div>
-              
-              <transition-group
-                  tag="div"
-                  name="resource-editor"
-                  class="resource-editor-container">
-                <resource-editor
-                    v-for="resource in resources"
-                    :key="resource.name"
-                    v-bind="resource"
-                    @change-amount="(n) => resource.amount = n"></resource-editor>
-              </transition-group>
-
-            </div>
-          
-          </div>
-
+          <a id="start-button" href="#" @click="currentViewKey = 'calculation'">Empezar</a>
         </section>
 
         <section id="results">
-          <div v-if="false">
-            <p>Total CO₂ eq: {{ normalizeNumber(co2) }} kg (por usuario: {{ normalizeNumber(co2/numberOfUsers) }})</p>
-            <p>Árboles equivalentes a este CO₂ eq: {{ normalizeNumber(numberOfTrees) }} (por usuario: {{ normalizeNumber(numberOfTrees/numberOfUsers) }})</p>
-          </div>
-          <div v-else>
-            <p>Total kg de CO₂ equivalente al consumo: {{ normalizeNumber(co2) }} kg. Árboles equivalentes a este CO₂ eq: {{ normalizeNumber(numberOfTrees) }}</p>
-            <p>(Por usuario: {{ normalizeNumber(co2/numberOfUsers) }} kg de CO₂ eq, {{ normalizeNumber(numberOfTrees/numberOfUsers) }} árboles)</p>
-          </div>
+          <p>Total kg de CO₂ equivalente al consumo: {{ normalizeNumber(co2) }} kg. Árboles equivalentes a este CO₂ eq: {{ normalizeNumber(numberOfTrees) }}</p>
+          <p v-show="numberOfUsers > 1">(Por usuario: {{ normalizeNumber(co2/numberOfUsers) }} kg de CO₂ eq, {{ normalizeNumber(numberOfTrees/numberOfUsers) }} árboles)</p>
         </section>
         
         <section
