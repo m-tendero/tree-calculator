@@ -135,28 +135,28 @@ const app = createApp({
 
       views: {
         explanation: {
-          id: "explanation",
+          key: "explanation",
           name: "?",
           forestHeightFactor: 0,
         },
         calculation: {
-          id: "calculation",
+          key: "calculation",
           name: "Cálculo",
           forestHeightFactor: 5,
         },
         forest: {
-          id: "forest",
+          key: "forest",
           name: "Bosque",
           forestHeightFactor: 8,
         },
-        sources: {
-          id: "sources",
+        more: {
+          key: "more",
           name: "...",
           forestHeightFactor: 3,
         },
       },
 
-      currentViewId: "explanation",
+      currentViewKey: "explanation",
     }
   },
   computed: {
@@ -197,7 +197,7 @@ const app = createApp({
       return frequencies
     },
     currentView () {
-      return this.views[this.currentViewId]
+      return this.views[this.currentViewKey]
     },
     forestHeight () {
       const ratio =  3 * window.innerWidth / window.innerHeight / 5
