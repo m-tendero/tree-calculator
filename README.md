@@ -5,7 +5,4 @@ Website that calculates the amount of CO₂ equivalent to an energy profile and 
 It's in Spanish and it uses Spanish government data.
 
 ## TODO:
-1. Update sources
-2. Cite Sources
-3. Explain process
-4. Polish appearance
+1. Polish appearance
